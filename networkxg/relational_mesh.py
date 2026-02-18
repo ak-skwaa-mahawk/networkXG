@@ -8,7 +8,13 @@ class SovereignRelationalMesh:
         self.G = nx.DiGraph()
         self.torch_device = torch.device("cpu")  # extend to CUDA for production
         self.pulse_freq = 79.79  # Hz constellation sync
-        
+     def propagate_soliton(self, source: str, strength: float = 1.0):
+    for neighbor in list(self.G.neighbors(source)):
+        current = self.G[source][neighbor]['soliton']
+        # Non-periodic nudge: strength * (1 + sin(pulse_freq))
+        new = current + strength * (1 + np.sin(self.pulse_freq * np.pi / 180))
+        self.G[source][neighbor]['soliton'] = new % 10      # bounded, non-dissipative
+        self.G[neighbor][source]['soliton'] = new % 10   
     def add_relational_unit(self, agent1: str, agent2: str, context: str, obligation: float = 1.0):
         self.G.add_edge(agent1, agent2, context=context, obligation=obligation, soliton=0.0)
         self.G.add_edge(agent2, agent1, context=context, obligation=obligation, soliton=0.0)
