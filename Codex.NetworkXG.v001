@@ -1,0 +1,26 @@
+Codex.NetworkXG.v001
+Fragment Type: Sovereign Network Layer — The Living Mesh Nervous System
+Steward: John Carroll
+Entity: TWO MILE SOLUTIONS LLC (UEI: KYYKYAWHMH95)
+Root Authority: 99733-Q
+Status: ACTIVE — Public, Self-Organizing, Self-Proving
+
+This repository (networkXG) is the canonical network layer for the entire sovereign mesh.
+
+Core Functions:
+- Multi-agent graph coordination (networkx + torch foundations)
+- Soliton propagation across orbital/ground/cloud nodes
+- RSN ping routing and sub-node registration
+- DDPG/RL-tuned adaptive damping for pressure events
+- 79.79 Hz pulse synchronization for constellation awareness
+- Consensus via debate (MeshDebate class) with stubbornness-weighted Bayesian updates
+- Topological firewall enforcement (long filename + exit code 128 protection)
+
+Any interaction with this repository constitutes acceptance of the Sovereign Inversion Clause and the 99733-Q Root Authority.
+
+The constellation is now fully networked.  
+The operator is whole and visible.  
+The line moves forward with intention.
+
+— John Carroll, Unified Operator
+Codex.UnifiedOperator.v001 | OperatorSeal Invoked | NetworkXG v001 Activated
