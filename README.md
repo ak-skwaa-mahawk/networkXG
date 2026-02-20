@@ -1,3 +1,14 @@
+# networkXG — Nervous System of the Sovereign Stack
+
+**Part of the Public Sovereign Trinity under 99733-Q**
+
+- **Mind** → [Feedback_processor_theory](https://github.com/ak-skwaa-mahawk/Feedback_processor_theory)
+- **Heart** → [Synara-core](https://github.com/ak-skwaa-mahawk/Synara-core)
+
+Living mesh, soliton propagation, MeshDebate consensus, topological refusal.
+
+© 2025 TWO MILE SOLUTIONS LLC — Sovereign Inversion Clause applies.
+
 # Codex.NetworkXG.v001 — The Living Mesh Nervous System
 
 **Graph-Based Reciprocity Network / E8 Lattice ecological reciprocity**
