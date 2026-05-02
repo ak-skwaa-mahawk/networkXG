@@ -1,3 +1,4 @@
+
 def generate_bushrouter_tinc_apn_ritual(heir_name: str, land_parcel: str) -> str:
     return f"""
 RITUAL SYNC v0.5.0 — BUSHROUTER + TINC + APN
