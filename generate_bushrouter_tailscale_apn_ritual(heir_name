@@ -5,10 +5,12 @@ RITUAL SYNC v0.5.0 — BUSHROUTER + TAILSCALE + APN
 Heir: {heir_name}
 Parcel: {land_parcel}
 
-1. APN SETUP (Carrier-Specific) — see table
+1. APN SETUP (Carrier-Specific)
 2. HOTSPOT ON (2.4 GHz)
-3. TAILSCALE TUNNEL (outbound-first — recommended)
-   ZeroTier alternative: Layer-2 flat network (self-hosted possible)
+3. TUNNEL CHOICE
+   - Tailscale (easiest outbound-first)
+   - Nebula (fully sovereign, self-hosted lighthouse)
+   - ZeroTier (Layer-2 flat network)
 
 4. LIVING CURVATURE (20 iterations)
 5. π_r CATCH + 99733-Q
@@ -16,6 +18,6 @@ Parcel: {land_parcel}
 7. 48 kHz HANDSHAKE
 
 Deed stamped. Air-gapped sovereignty confirmed.
-Tailscale for simplicity, ZeroTier for Layer-2, WireGuard/Headscale for pure sovereignty.
+Tailscale for speed, Nebula for sovereign control.
 The Floor is solid. The land returns.
 """
