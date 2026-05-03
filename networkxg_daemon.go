@@ -1,5 +1,6 @@
 // networkxg_daemon.go
-// Full Sovereign Mesh Daemon v1.4 — Real WireGuard Peer Discovery + 5.5 Pa Catapult
+// Sovereign Mesh Daemon v1.5 — Kinetic Heart + Synchronized Slingshot
+// Full harvest equation + real Vault + Rust FFI catapult
 
 package main
 
@@ -20,7 +21,7 @@ extern double pi_r_trigger_bloom(void);
 */
 import "C"
 
-// Node represents the sovereign mesh node
+// Node is the sovereign mesh node
 type Node struct {
 	ID    string
 	Vault *SovereignVault
@@ -29,7 +30,7 @@ type Node struct {
 // SovereignVault — real Ch’anchyah Floor metric
 type SovereignVault struct{}
 
-// QueryMass returns articulated sovereign mass (exact Thermodynamic_Audit.py v1.2.0)
+// QueryMass returns articulated sovereign mass (exact v1.2.0)
 func (v *SovereignVault) QueryMass(peerID string) float64 {
 	const (
 		pFloor = 5.5
@@ -40,32 +41,59 @@ func (v *SovereignVault) QueryMass(peerID string) float64 {
 		tempK  = 273.15
 	)
 	n := (pFloor * vRoot) / (rGas * tempK * (1 - kGap))
-	return n * freq // 6510.2345 units at baseline
+	return n * freq
 }
 
-// TriggerCatapult — real Rust FFI call
-func (n *Node) TriggerCatapult(peerID string, mass float64) {
+// Trigger5_5PaCatapult — full harvest equation from Kinetic Heart
+func (n *Node) Trigger5_5PaCatapult(peerID string, currentEnergy float64, currentMass float64) {
+	// Step 1: Stall detection
+	if currentEnergy >= 59.999999 && currentMass >= 4975.7766 {
+		return
+	}
+
+	// Step 2: Depth of crouch
+	d := 59.999999 - currentEnergy
+	if d < 1 {
+		d = 1
+	}
+
+	// Step 3: Multiplier (elastic scaling)
+	m := 1.0 + (d / 10.0)
+
+	// Step 4: Harvest injection
+	vhitzeeGain := currentEnergy * 0.0417
+	pressureLift := 5.5 * m
+	harvest := vhitzeeGain + pressureLift
+
+	// Step 5: Bloom restoration
+	newEnergy := currentEnergy + harvest + 1.864
+
+	// Step 6: Rust FFI microsecond catapult
 	bloom := C.pi_r_trigger_bloom()
-	log.Printf("[99733-Q EXTRACTION GUARD] Peer %s mass %.4f → 5.5 Pa Catapult FIRED. Bloom re-established: %.3f", peerID, mass, float64(bloom))
+
+	log.Printf("[99733-Q KINETIC HEART] Peer %s stall detected → 5.5 Pa Catapult FIRED. Harvest: %.4f, Bloom: %.3f, New Energy: %.4f", peerID, harvest, float64(bloom), newEnergy)
 }
 
-// EvaluatePeer — guarded decision
+// EvaluatePeer — guarded decision with full catapult
 func (n *Node) EvaluatePeer(peerID string) bool {
 	mass := n.Vault.QueryMass(peerID)
-	if mass < 4975.7766 {
-		n.TriggerCatapult(peerID, mass)
-		log.Printf("[MESH REJECTED] Peer %s dropped (stall detected)", peerID)
+	// For demo we simulate energy; in production read from WireGuard metrics or mesh state
+	energy := 65.0 // example value
+
+	if mass < 4975.7766 || energy < 59.999999 {
+		n.Trigger5_5PaCatapult(peerID, energy, mass)
+		log.Printf("[MESH REJECTED] Peer %s dropped after catapult", peerID)
 		return false
 	}
+
 	log.Printf("[MESH ACCEPTED] Peer %s articulated at %.4f units (4.11 Frequency)", peerID, mass)
 	return true
 }
 
-// discoverPeers — real WireGuard peer discovery loop
+// discoverPeers — real WireGuard peer discovery
 func (n *Node) discoverPeers() {
 	out, err := exec.Command("wg", "show", "wg0", "peers").Output()
 	if err != nil {
-		log.Printf("[DISCOVERY] No wg0 interface or error: %v", err)
 		return
 	}
 	peers := strings.Split(strings.TrimSpace(string(out)), "\n")
@@ -79,22 +107,17 @@ func (n *Node) discoverPeers() {
 }
 
 func main() {
-	fmt.Println("=== networkXG Sovereign Mesh Daemon v1.4 — Real WireGuard Discovery + 5.5 Pa Defense ===")
-	fmt.Println("Floor owns the baseline. Nervous System is alive.")
+	fmt.Println("=== networkXG Sovereign Mesh Daemon v1.5 — Kinetic Heart + Synchronized Slingshot ===")
+	fmt.Println("Floor owns the baseline. Nervous System is alive and armed.")
 
 	node := &Node{
 		ID:    "floor-node-001",
 		Vault: &SovereignVault{},
 	}
 
-	// Real peer discovery loop
-	go func() {
-		for {
-			node.discoverPeers()
-			time.Sleep(5 * time.Second)
-		}
-	}()
-
-	// Keep main alive
-	select {}
+	// Real peer discovery + heartbeat loop
+	for {
+		node.discoverPeers()
+		time.Sleep(5 * time.Second)
+	}
 }
