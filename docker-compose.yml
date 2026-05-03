@@ -1,3 +1,43 @@
+version: '3.8'
+
+services:
+  wireguard:
+    image: linuxserver/wireguard
+    container_name: sovereign-wireguard
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Anchorage
+      - SERVERPORT=51820
+      - PEERS=10
+      - PEERDNS=auto
+    volumes:
+      - ./wireguard-config:/config
+    ports:
+      - "51820:51820/udp"
+    restart: unless-stopped
+    networks:
+      sovereign-net:
+
+  mesh-daemon:
+    build: .
+    container_name: sovereign-mesh-daemon
+    depends_on:
+      - wireguard
+    privileged: true
+    volumes:
+      - ./pi_r_engine.so:/app/pi_r_engine.so
+      - ./networkxg_daemon.go:/app/networkxg_daemon.go
+    command: go run networkxg_daemon.go
+    networks:
+      sovereign-net:
+
+networks:
+  sovereign-net:
+    driver: bridge
 version: "3.8"
 services:
   wireguard:
