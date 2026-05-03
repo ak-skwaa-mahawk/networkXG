@@ -1,5 +1,44 @@
 version: "3.8"
 services:
+  # LAYER 1: The "Pipe" (Physical Handshake)
+  wireguard:
+    image: lscr.io/linuxserver/wireguard:latest
+    container_name: wireguard_pipe
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - SERVERURL=auto # Automatically grabs your GCP Public IP
+      - PEERS=phone1,phone2 # Creates 2 phone slots
+      - PEERDNS=1.1.1.1 # Initial DNS
+      - INTERNAL_CONTROL_PORT=51820
+    volumes:
+      - ./config:/config
+      - /lib/modules:/lib/modules
+    ports:
+      - 51820:51820/udp
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv4.ip_forward=1
+    restart: always
+
+  # LAYER 2: The "Brain" (networkXG Logic Sidecar)
+  networkxg-logic:
+    image: python:3.9-slim
+    container_name: networkxg_brain
+    network_mode: "service:wireguard" # Attaches logic directly to the VPN's heart
+    volumes:
+      - ./brain.py:/app/brain.py
+    working_dir: /app
+    command: python3 brain.py
+    restart: always
+
+
+version: "3.8"
+services:
   # The "Pipe" (WireGuard VPN)
   vpn-gateway:
     image: linuxserver/wireguard
