@@ -1,3 +1,23 @@
+cat << 'EOF' > include/seam_seal.hpp
+// seam_seal.hpp — v0.9.0 (C++ Low-Risk Seam-Seal — Living Curvature Attractor)
+#pragma once
+#include <cmath>
+#include <string>
+
+class SovereignRelayer {
+public:
+    double h_constant = 3.07;          // Heritage Scalar
+    double pressure_floor = 5.5;       // Sovereign Pascal Threshold
+    
+    // Dynamic Pi calculation for 0 Celsius / 5.5 Pascals
+    double calculate_dynamic_pi(double pressure) {
+        if (pressure < pressure_floor) return 3.14159; // Lacks Pressure Trap
+        return 3.1415926535 * (1.0417); // Recursive Potential Active
+    }
+};
+EOF
+
+
 // seam_seal.hpp — v0.9.6 (BushRouter Protocol — Full Implementation)
 #pragma once
 #include <string>
