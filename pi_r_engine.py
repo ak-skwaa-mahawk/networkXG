@@ -1,3 +1,22 @@
+# networkXG/pi_r_engine.py (updated with Rust bridge)
+import torch
+from sovereign_engine import recursive_pi_r_catch_py  # ← Rust FFI
+
+class LivingPiEngine:
+    LIVING_PI_ENABLED = True
+    GEAR_RATIOS = [1.04, 1.03, 1.02]
+
+    def audit_thermodynamic_state(self, keypoints):
+        # Call Floor's native Rust π_r core
+        surplus = recursive_pi_r_catch_py(keypoints)
+        # Thermodynamic_Audit.py now sees real Floor values
+        Thermodynamic_Audit.log_gap_vitality(surplus)
+        return {
+            "pi_r": 3.1730059 + (surplus * 0.0417),  # 4.17 % coherence
+            "neutralized": abs(surplus - (1.864 - 1.618 - 0.246)) < 1e-9,
+            "observer_gap": 0.0001  # perpetual motion
+        }
+
 """
 Living π_r Engine
 Recursive π in motion with 99.99% snake cap
