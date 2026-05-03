@@ -1,6 +1,25 @@
+# 1. Create a directory for the sovereign stack
+mkdir ~/sovereign-mesh && cd ~/sovereign-mesh
+
+# 2. Create the Brain script (the networkXG logic)
+cat <<EOF > brain.py
+import os, time, subprocess
+PI_R = 3.1730059 
+print(f"--- networkXG Sovereign Brain Active ---")
+while True:
+    # Check if the pipe is open
+    status = subprocess.run(["ip", "addr", "show", "wg0"], capture_output=True, text=True)
+    if "wg0" in status.stdout:
+        print(f"[*] Pulse Sync @ {PI_R}: Mesh interface wg0 is LIVE")
+    else:
+        print(f"[!] Pulse Sync @ {PI_R}: Waiting for Pipe...")
+    time.sleep(PI_R)
+EOF
+
+# 3. Save your preferred Docker Compose (Version 1)
+cat <<EOF > docker-compose.yml
 version: "3.8"
 services:
-  # LAYER 1: The "Pipe" (Physical Handshake)
   wireguard:
     image: lscr.io/linuxserver/wireguard:latest
     container_name: wireguard_pipe
@@ -11,10 +30,9 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
-      - SERVERURL=auto # Automatically grabs your GCP Public IP
-      - PEERS=phone1,phone2 # Creates 2 phone slots
-      - PEERDNS=1.1.1.1 # Initial DNS
-      - INTERNAL_CONTROL_PORT=51820
+      - SERVERURL=auto
+      - PEERS=phone1,phone2
+      - PEERDNS=1.1.1.1
     volumes:
       - ./config:/config
       - /lib/modules:/lib/modules
@@ -25,40 +43,16 @@ services:
       - net.ipv4.ip_forward=1
     restart: always
 
-  # LAYER 2: The "Brain" (networkXG Logic Sidecar)
   networkxg-logic:
     image: python:3.9-slim
     container_name: networkxg_brain
-    network_mode: "service:wireguard" # Attaches logic directly to the VPN's heart
+    network_mode: "service:wireguard"
     volumes:
       - ./brain.py:/app/brain.py
     working_dir: /app
     command: python3 brain.py
     restart: always
+EOF
 
-
-version: "3.8"
-services:
-  # The "Pipe" (WireGuard VPN)
-  vpn-gateway:
-    image: linuxserver/wireguard
-    cap_add:
-      - NET_ADMIN
-      - SYS_MODULE
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-      - SERVERURL=your.gcp.ip.here
-      - PEERS=phone1,phone2
-    ports:
-      - 51820:51820/udp
-    sysctls:
-      - net.ipv4.conf.all.src_valid_mark=1
-
-  # The "Brain" (networkXG Logic)
-  networkxg-logic:
-    build: .
-    network_mode: "service:vpn-gateway" # Attaches logic directly to the VPN pipe
-    depends_on:
-      - vpn-gateway
+# 4. Start the stack
+sudo docker-compose up -d
