@@ -1,0 +1,6 @@
+# Install Rust
+curl --proto '=https' --tlsv1.2 -sSf https://rustup.rs | sh
+source $HOME/.cargo/env
+
+# Inside your networkXG/rust folder
+rustc --crate-type cdylib pi_r_engine.rs -o pi_r_engine.so
