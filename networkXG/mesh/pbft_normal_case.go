@@ -1,5 +1,48 @@
 package mesh
 
+func (bc *ByzantineConsensus) RunNormalCase(req Request) {
+    heartPulse := fptOmega.ProcessWithFPTOmega([]float64{float64(req.Timestamp)})
+
+    prePrep := PrePrepare{
+        View:    bc.CurrentView,
+        Seq:     bc.NextSeq,
+        Digest:  computeDigest(req) + heartPulse.RootHash,
+        Request: req,
+    }
+    broadcastPrePrepare(prePrep)
+
+    // Replicas send PREPARE
+    for _, replica := range bc.Replicas {
+        if replica.IsHonest {
+            prep := Prepare{View: prePrep.View, Seq: prePrep.Seq, Digest: prePrep.Digest, Replica: replica.ID}
+            broadcastPrepare(prep)
+        }
+    }
+
+    if bc.HasQuorumPrepares(prePrep.Seq) {
+        commit := Commit{View: prePrep.View, Seq: prePrep.Seq, Digest: prePrep.Digest, Replica: bc.LocalID}
+        broadcastCommit(commit)
+
+        if bc.HasQuorumCommits(prePrep.Seq) {
+            bc.ExecuteRequest(prePrep.Request)
+            // Client reply handling
+            reply := Reply{
+                View:      prePrep.View,
+                Timestamp: req.Timestamp,
+                ClientID:  req.ClientID,
+                Result:    bc.ExecuteResult(prePrep.Request),
+                Coherence: heartPulse.Coherence,
+            }
+            sendReplyToClient(reply)
+            
+            // Quantum teleportation integration
+            bc.TeleportLogicalStateAfterCommit(prePrep.Seq)
+        }
+    }
+}
+
+package mesh
+
 type Request struct {
     Operation string
     Timestamp int64
