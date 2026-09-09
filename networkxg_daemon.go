@@ -6,8 +6,10 @@ package main
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"log"
+	"net"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -234,6 +236,61 @@ func (n *Node) discoverPeers() {
                 peerID := strings.Fields(p)[0]
                 n.EvaluatePeer(peerID)
         }
+}
+
+
+const ensLegisSocket = "/data/data/com.termux/files/home/networkXG/ens_legis.sock"
+
+type TelemetryPayload struct {
+	ActionType     string                 `json:"action_type"`
+	Principal      string                 `json:"principal"`
+	TargetResource string                 `json:"target_resource"`
+	Payload        map[string]interface{} `json:"payload"`
+}
+
+type AuthorityVerdict struct {
+	Allowed     bool   `json:"allowed"`
+	Regime      string `json:"regime"`
+	CharterHash string `json:"charter_hash"`
+	Attestation string `json:"attestation"`
+	Error       string `json:"error"`
+}
+
+func VerifyWithEnsLegis(actionType string, resource string, data map[string]interface{}) (*AuthorityVerdict, error) {
+	conn, err := net.Dial("unix", ensLegisSocket)
+	if err != nil {
+		return nil, fmt.Errorf("authority daemon unreachable: %w", err)
+	}
+	defer conn.Close()
+
+	envelope := TelemetryPayload{
+		ActionType:     actionType,
+		Principal:      "SOVEREIGN_MESH_DAEMON_V1.7",
+		TargetResource: resource,
+		Payload:        data,
+	}
+
+	raw, err := json.Marshal(envelope)
+	if err != nil {
+		return nil, err
+	}
+
+	if _, err := conn.Write(raw); err != nil {
+		return nil, err
+	}
+
+	buf := make([]byte, 4096)
+	n, err := conn.Read(buf)
+	if err != nil {
+		return nil, err
+	}
+
+	var verdict AuthorityVerdict
+	if err := json.Unmarshal(buf[:n], &verdict); err != nil {
+		return nil, err
+	}
+
+	return &verdict, nil
 }
 
 func main() {

@@ -105,3 +105,50 @@ if __name__ == "__main__":
         payload={}
     )
     print("Test 2 (Breach):", executor.evaluate_authority(action_invalid))
+
+import os
+import socket
+
+SOCKET_PATH = "/data/data/com.termux/files/home/networkXG/ens_legis.sock"
+
+def serve_authority_daemon():
+    if os.path.exists(SOCKET_PATH):
+        os.remove(SOCKET_PATH)
+
+    server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    server.bind(SOCKET_PATH)
+    server.listen(5)
+    print(f"[*] Ens Legis Authority Daemon listening on {SOCKET_PATH}")
+
+    charter = EntityCharter(entity_id="NORTH-STAR-SEED-001")
+    executor = EnsLegisExecutor(charter)
+
+    try:
+        while True:
+            conn, _ = server.accept()
+            data = conn.recv(4096)
+            if not data:
+                conn.close()
+                continue
+            
+            try:
+                msg = json.loads(data.decode("utf-8"))
+                action = ActionEnvelope(
+                    action_type=msg.get("action_type", "TELEMETRY_EMIT"),
+                    invoking_principal=msg.get("principal", "UNKNOWN"),
+                    target_resource=msg.get("target_resource", "./telemetry.json"),
+                    payload=msg.get("payload", {})
+                )
+                verdict = executor.evaluate_authority(action)
+                conn.sendall(json.dumps(verdict).encode("utf-8"))
+            except Exception as e:
+                err_resp = {"allowed": False, "error": str(e)}
+                conn.sendall(json.dumps(err_resp).encode("utf-8"))
+            finally:
+                conn.close()
+    finally:
+        if os.path.exists(SOCKET_PATH):
+            os.remove(SOCKET_PATH)
+
+if __name__ == "__main__" and os.environ.get("RUN_AUTHORITY_SERVER") == "1":
+    serve_authority_daemon()
