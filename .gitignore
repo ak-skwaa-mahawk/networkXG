@@ -40,3 +40,5 @@
 # debug information files
 *.dwo
 daemon.log
+ens_legis.log
+networkxg_daemon
