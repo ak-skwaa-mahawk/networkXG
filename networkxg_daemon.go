@@ -223,7 +223,17 @@ func (n *Node) EvaluatePeer(peerID string) bool {
         return true
 }
 
+var wgMissingWarned bool
+
 func (n *Node) discoverPeers() {
+	_, lookErr := exec.LookPath("wg")
+	if lookErr != nil {
+		if !wgMissingWarned {
+			log.Println("[DISCOVERY] WireGuard (wg) not found — running in local loopback soliton mode.")
+			wgMissingWarned = true
+		}
+		return
+	}
         out, err := exec.Command("wg", "show", "wg0", "peers").Output()
         if err != nil {
                 return
@@ -305,6 +315,22 @@ func main() {
 
         for {
                 node.discoverPeers()
+
+		bloomVal := float64(C.pi_r_trigger_bloom())
+		telemetryData := map[string]interface{}{
+			"pi_r_bloom": bloomVal,
+			"epoch":      time.Now().Unix(),
+			"node_id":    node.ID,
+		}
+
+		verdict, err := VerifyWithEnsLegis("SOLITON_BLOOM_CYCLE", "./telemetry.json", telemetryData)
+		if err != nil {
+			log.Printf("[AUTHORITY GATEWAY] Offline / Unreachable: %v", err)
+		} else if !verdict.Allowed {
+			log.Printf("[ULTRA VIRES DETECTED] Action vetoed: %s", verdict.Error)
+		} else {
+			log.Printf("[INTRA VIRES CONFIRMED] Bloom: %.6f | Charter: %s... | %s", bloomVal, verdict.CharterHash[:8], verdict.Attestation)
+		}
                 time.Sleep(5 * time.Second)
         }
 }
