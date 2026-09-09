@@ -4,17 +4,17 @@
 package main
 
 import (
-        "crypto/sha256"
-        "encoding/hex"
-        "fmt"
-        "log"
-        "os/exec"
-        "strconv"
-        "strings"
-        "time"
+	"crypto/sha256"
+	"encoding/hex"
+	"fmt"
+	"log"
+	"os/exec"
+	"strconv"
+	"strings"
+	"time"
 )
 
-// === Rust FFI ===
+// // === Rust FFI ===
 /*
 #cgo LDFLAGS: -L. -lpi_r_engine -ldl
 #include <stdlib.h>
